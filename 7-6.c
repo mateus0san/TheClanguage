@@ -29,32 +29,36 @@ int main(int argc, char *argv[])
 	}
 	exit(0);
 }
-
+#define MAXLINE 10000
 void filecmp(FILE *fp1, FILE *fp2, FILE *fo)
 {
-	FILE *faux1, *faux2;
-	int c1, c2;
+	int c1, c2, i;
+	char line1[MAXLINE];
+	char line2[MAXLINE];
 
-	faux1 = fp1;
-	faux2 = fp2;
-	c1 = fgetc(fp1);
-	c2 = fgetc(fp2);
-	while (c1 == c2) {
-		if (c1 == EOF && c2 == EOF)
+	for (i = 0; i < MAXLINE; i++) {
+		if ((line1[i] = c1 = getc(fp1)) != (line2[i] = c2 = getc(fp2)))
 			break;
-		if (c1 == '\n' && c2 == '\n') {
-			faux1 = fp1;
-			faux2 = fp2;
+		if (c1 == '\n' && c2 == '\n'){
+			i = -1;
+			line1[0] = '\0';
+			line2[0] = '\0';
+			continue;
 		}
-		c1 = fgetc(fp1);
-		c2 = fgetc(fp2);
 	}
-	if (c1 != c2){
-		for (c1 = fgetc(faux1); c1 != '\n' && c1 != EOF; c1 = fgetc(faux1))
+	if (i >= MAXLINE) {
+		printf("line too big\n");
+		exit(4);
+	}
+	line1[i+1] = '\0';
+	line2[i+1] = '\0';
+	if (c1 != c2) {
+		fprintf(fo, "%s", line1);
+		while ((c1 = getc(fp1)) != EOF && c1 != '\n')
 			putc(c1, fo);
-		printf("\n");
-		for (c2 = fgetc(faux2); c2 != '\n' && c2 != EOF; c2 = fgetc(faux2))
+		fprintf(fo, "\n%s", line2);
+		while ((c2 = getc(fp2)) != EOF && c2 != '\n')
 			putc(c2, fo);
-		printf("\n");
+		putc('\n', fo);
 	}
 }
