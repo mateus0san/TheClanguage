@@ -46,6 +46,8 @@ int getword(char *word, int lim)
 	}
 	while (--lim > 0 && (isalpha(c = getch()) || c == '-'))
 		*w++ = c;
+	if (c != EOF)
+		ungetch(c);
 	*w = '\0';
 	return word[0];
 }
